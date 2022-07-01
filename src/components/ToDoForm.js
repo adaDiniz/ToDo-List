@@ -1,77 +1,80 @@
 import { useState, useEffect } from "react";
 import Form from "react-bootstrap/Form";
+import { Button } from "react-bootstrap";
 
-
-const API = "http://localhost:3000";
 
 const ToDoForm = () => {
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [todos, setTodos] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [state, setState] = useState({
+    title: "",
+    description: "",
+    category: "",
+    date: "",
+  })
+  
+  const handleChange = (event) => {
+    
+    setState({
+      ...state,
+      [event.target.name]: event.target.value,
+    });
+  }
 
-  useEffect(() => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
-    const loadData = async() => {
-      
-      setLoading(true);
-
-      const res = await fetch(API + "/todos")
-      .then((res) => res.JSON())
-      .then((data) => data)
-      .catch((err) => console.log(err));
-
-      setLoading(false);
-
-      setTodos(res)
-    }
-
-    loadData();
-  }, [])
- 
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const toDo = {
-      id: Math.random(),
-      title,
-      description,
+   const toDo = {
+    ...state,
+    [event.target.name]: event.target.value,
     };
 
     console.log(toDo);
+ 
+  }
 
-    await fetch(API + '/todos', {
-      method: "POST",
-      body: JSON.stringify(toDo),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    setTitle("");
-    setDescription("");
-  };
-  
   return (
     <div>
-      <Form className="toDoForm" onSubmit={handleSubmit}>
-        <Form.Control type="text" name="text" placeholder="Título da Task" onChange={(e) => setTitle(e.target.value)} value={title || ""} required />
+      <Form className="toDoForm" onSubmit={ handleSubmit }>
+      <Form.Group className="mb-3">
+        <Form.Control 
+          type="text" 
+          name="title" 
+          onChange={ handleChange } 
+          placeholder="Título da Task" 
+          required />
+      </Form.Group>
 
-        <Form.Control as="textarea" rows={2} name="description" placeholder="Descreva sua Task" onChange={(e) => setDescription(e.target.value)} value={description || ""} required />
-        
-        <Form.Select aria-label="Qual é a prioridade da sua task?">
-          <option> </option>
-          <option value="facil">Fácil</option>
-          <option value="dificil">Difícil</option>
-          <option value="urgente">Urgente</option>
+      <Form.Group className="mb-3">
+        <Form.Control 
+          as="textarea" 
+          rows={2} 
+          name="description" 
+          onChange={ handleChange } 
+          placeholder="Descreva sua Task" />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Select aria-label="Qual é a prioridade da sua task?" 
+          name="category" onChange={ handleChange }>
+            <option value="Fácil">Fácil</option>
+            <option value="Difícil">Difícil</option>
+            <option value="Urgente">Urgente</option>
         </Form.Select>
+      </ Form.Group>
 
-        <input type="date" name="dateConclusion"></input>
+        <input type="date" 
+          name="date" 
+            onChange={ handleChange } />
 
-        <button className="toDoButton">Adicionar Task</button> 
-      </Form> 
+      <Form.Group className="mb-3">
+        <Button className="toDoButton">Adicionar Task</Button> 
+      </Form.Group>
+
+    </Form>
+
+      <div>
+        <h2>Próximas Tasks:</h2>
+      </div> 
     </div>
   )
 }
